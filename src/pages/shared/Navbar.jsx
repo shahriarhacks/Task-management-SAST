@@ -1,15 +1,27 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../provider/AuthProvider";
 
 export default function NavBar() {
   const [navbar, setNavbar] = useState(false);
+
+  const { user, logout } = useContext(AuthContext);
+  console.log(user);
+
+  const handleLogOut = () => {
+    logout()
+      .then(() => {
+        localStorage.removeItem("access-token");
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <nav className="w-full bg-gray-800 shadow">
       <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
         <div>
           <div className="flex items-center justify-between py-3 md:py-5 md:block">
-            <Link to="javascript:void(0)">
+            <Link to="/">
               <h2 className="text-2xl font-bold text-white">LOGO</h2>
             </Link>
             <div className="md:hidden">
@@ -70,37 +82,62 @@ export default function NavBar() {
                 <Link to="/contact">Contact US</Link>
               </li>
             </ul>
-
-            <div className="mt-3 space-y-2 lg:hidden md:inline-block">
-              <Link
-                to="/signin"
-                className="inline-block w-full px-4 py-2 text-center text-white bg-gray-600 rounded-md shadow hover:bg-gray-800"
-              >
-                Sign in
-              </Link>
-              <Link
-                to="signup"
-                className="inline-block w-full px-4 py-2 text-center text-gray-800 bg-white rounded-md shadow hover:bg-gray-100"
-              >
-                Sign up
-              </Link>
-            </div>
+            {user && user.uid ? (
+              <>
+                <div className="mt-3 space-y-2 lg:hidden md:inline-block">
+                  <button
+                    onClick={() => handleLogOut()}
+                    className="inline-block w-full px-4 py-2 text-center text-white bg-gray-600 rounded-md shadow hover:bg-gray-800"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mt-3 space-y-2 lg:hidden md:inline-block">
+                  <Link
+                    to="/signin"
+                    className="inline-block w-full px-4 py-2 text-center text-white bg-gray-600 rounded-md shadow hover:bg-gray-800"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    to="signup"
+                    className="inline-block w-full px-4 py-2 text-center text-gray-800 bg-white rounded-md shadow hover:bg-gray-100"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
-        <div className="hidden space-x-2 md:inline-block">
-          <Link
-            to="signin"
-            className="px-4 py-2 text-white bg-gray-600 rounded-md shadow hover:bg-gray-800"
-          >
-            Sign in
-          </Link>
-          <Link
-            to="signup"
-            className="px-4 py-2 text-gray-800 bg-white rounded-md shadow hover:bg-gray-100"
-          >
-            Sign up
-          </Link>
-        </div>
+        {user && user.uid ? (
+          <div className="hidden space-x-2 md:inline-block">
+            <button
+              onClick={() => handleLogOut()}
+              className="px-4 py-2 text-white bg-gray-600 rounded-md shadow hover:bg-gray-800"
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <div className="hidden space-x-2 md:inline-block">
+            <Link
+              to="signin"
+              className="px-4 py-2 text-white bg-gray-600 rounded-md shadow hover:bg-gray-800"
+            >
+              Sign in
+            </Link>
+            <Link
+              to="signup"
+              className="px-4 py-2 text-gray-800 bg-white rounded-md shadow hover:bg-gray-100"
+            >
+              Sign up
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );

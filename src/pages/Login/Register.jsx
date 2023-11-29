@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../provider/AuthProvider";
 
 const Register = () => {
   const [signUpError, setSignUpError] = useState("");
   const [createdUserEmail, setCreatedUserEmail] = useState("");
+  const { createUser, updateUser, loginGoogle } = useContext(AuthContext);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -14,7 +17,31 @@ const Register = () => {
 
   const handleRegister = (data) => {
     setSignUpError("");
-    console.log(data);
+    createUser(data?.email, data?.password)
+      .then((result) => {
+        const userInfo = {
+          displayName: data?.name,
+        };
+        updateUser(userInfo)
+          .then(() => {
+            reset();
+            navigate("/");
+            console.log(result.user);
+          })
+          .catch((err) => setSignUpError(err.message));
+      })
+      .catch((err) => setSignUpError(err.message));
+  };
+
+  const googleLogin = () => {
+    setSignUpError("");
+    loginGoogle()
+      .then((result) => {
+        const user = result.user;
+        navigate("/");
+        console.log(user);
+      })
+      .catch((err) => setSignUpError(err.message));
   };
 
   return (
@@ -95,7 +122,10 @@ const Register = () => {
           </Link>
         </div>
         <div className="divider">OR</div>
-        <button className="btn btn-outline w-full hover:rounded-full">
+        <button
+          onClick={() => googleLogin()}
+          className="btn btn-outline w-full hover:rounded-full"
+        >
           CONTINUE WITH GOOGLE
         </button>
       </div>

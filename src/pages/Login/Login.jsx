@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../provider/AuthProvider";
 
 const Login = () => {
   const [loginError, setLoginError] = useState("");
   const [loginUserEmail, setLoginUserEmail] = useState("");
+  const { loginUser, loginGoogle } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
   const {
     register,
     formState: { errors },
@@ -14,8 +21,26 @@ const Login = () => {
 
   const handleLogin = (data) => {
     setLoginError("");
+    loginUser(data?.email, data?.password)
+      .then((result) => {
+        setLoginUserEmail(data?.email);
+        reset();
+        navigate(from, { replace: true });
+        console.log(result.user);
+        reset();
+      })
+      .catch((err) => setLoginError(err.message));
+  };
 
-    console.log(data);
+  const googleLogin = () => {
+    setLoginError("");
+    loginGoogle()
+      .then((result) => {
+        const user = result.user;
+        setLoginUserEmail(user?.email);
+        navigate(from, { replace: true });
+      })
+      .catch((err) => setLoginError(err.message));
   };
 
   return (
@@ -72,13 +97,16 @@ const Login = () => {
           />
         </form>
         <div className="flex justify-between">
-          New to Doya Shop Buy Sell Bazar <p></p>
+          <p>New to Task Manager</p>
           <Link className="text-secondary" to="/signup">
             Register
           </Link>
         </div>
         <div className="divider">OR</div>
-        <button className="btn btn-outline w-full hover:rounded-full">
+        <button
+          onClick={() => googleLogin()}
+          className="btn btn-outline w-full hover:rounded-full"
+        >
           CONTINUE WITH GOOGLE
         </button>
       </div>
