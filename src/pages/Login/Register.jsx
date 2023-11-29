@@ -2,10 +2,12 @@ import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+import Swal from "sweetalert2";
 
 const Register = () => {
+  const axiosPublic = useAxiosPublic();
   const [signUpError, setSignUpError] = useState("");
-  const [createdUserEmail, setCreatedUserEmail] = useState("");
   const { createUser, updateUser, loginGoogle } = useContext(AuthContext);
   const navigate = useNavigate();
   const {
@@ -18,15 +20,32 @@ const Register = () => {
   const handleRegister = (data) => {
     setSignUpError("");
     createUser(data?.email, data?.password)
+      // eslint-disable-next-line no-unused-vars
       .then((result) => {
         const userInfo = {
           displayName: data?.name,
         };
         updateUser(userInfo)
           .then(() => {
-            reset();
-            navigate("/");
-            console.log(result.user);
+            const createdUser = {
+              email: data.email,
+              name: data.name,
+              role: "user",
+            };
+            axiosPublic.post("/users/create", createdUser).then((res) => {
+              if (res.data.success) {
+                localStorage.setItem("token", res.data.token);
+                reset();
+                Swal.fire({
+                  position: "top-end",
+                  icon: "success",
+                  title: "User created successfully.",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                navigate("/");
+              }
+            });
           })
           .catch((err) => setSignUpError(err.message));
       })
@@ -38,8 +57,24 @@ const Register = () => {
     loginGoogle()
       .then((result) => {
         const user = result.user;
-        navigate("/");
-        console.log(user);
+        const createdUser = {
+          email: user.email,
+          name: user.displayName,
+          role: "user",
+        };
+        axiosPublic.post("/users/create", createdUser).then((res) => {
+          if (res.data.success) {
+            localStorage.setItem("token", res.data.token);
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "User Created By Google successfully.",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            navigate("/");
+          }
+        });
       })
       .catch((err) => setSignUpError(err.message));
   };

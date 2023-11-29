@@ -6,12 +6,11 @@ export default function NavBar() {
   const [navbar, setNavbar] = useState(false);
 
   const { user, logout } = useContext(AuthContext);
-  console.log(user);
 
   const handleLogOut = () => {
     logout()
       .then(() => {
-        localStorage.removeItem("access-token");
+        localStorage.removeItem("token");
       })
       .catch((err) => console.log(err));
   };

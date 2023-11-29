@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Home() {
   return (
     <div className="bg-black">
@@ -11,18 +13,18 @@ function Home() {
             the readable content of a page when looking at its layout.
           </p>
           <div className="items-center justify-center space-y-3 sm:space-x-6 sm:space-y-0 sm:flex lg:justify-start">
-            <a
-              href="javascript:void(0)"
+            <Link
+              to="/"
               className="block px-6 py-2 text-center text-white bg-yellow-600 rounded-md"
             >
               Buy Now
-            </a>
-            <a
-              href="javascript:void(0)"
+            </Link>
+            <Link
+              to="/"
               className="block px-6 py-2 text-center text-gray-500 bg-white rounded-md"
             >
               See More
-            </a>
+            </Link>
           </div>
         </div>
         <div>

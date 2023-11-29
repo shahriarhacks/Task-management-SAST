@@ -2,10 +2,12 @@ import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+import Swal from "sweetalert2";
 
 const Login = () => {
+  const axiosPublic = useAxiosPublic();
   const [loginError, setLoginError] = useState("");
-  const [loginUserEmail, setLoginUserEmail] = useState("");
   const { loginUser, loginGoogle } = useContext(AuthContext);
 
   const navigate = useNavigate();
@@ -22,12 +24,26 @@ const Login = () => {
   const handleLogin = (data) => {
     setLoginError("");
     loginUser(data?.email, data?.password)
+      // eslint-disable-next-line no-unused-vars
       .then((result) => {
-        setLoginUserEmail(data?.email);
-        reset();
-        navigate(from, { replace: true });
-        console.log(result.user);
-        reset();
+        const createdUser = {
+          email: data?.email,
+          role: "user",
+        };
+        axiosPublic.post("/auth/jwt", createdUser).then((res) => {
+          if (res.data.success) {
+            localStorage.setItem("token", res.data.token);
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "User created successfully.",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            navigate(from, { replace: true });
+            reset();
+          }
+        });
       })
       .catch((err) => setLoginError(err.message));
   };
@@ -37,8 +53,23 @@ const Login = () => {
     loginGoogle()
       .then((result) => {
         const user = result.user;
-        setLoginUserEmail(user?.email);
-        navigate(from, { replace: true });
+        const createdUser = {
+          email: user.email,
+          role: "user",
+        };
+        axiosPublic.post("/auth/jwt", createdUser).then((res) => {
+          if (res.data.success) {
+            localStorage.setItem("token", res.data.token);
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "User created successfully.",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            navigate(from, { replace: true });
+          }
+        });
       })
       .catch((err) => setLoginError(err.message));
   };
