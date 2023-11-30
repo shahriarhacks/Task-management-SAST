@@ -72,13 +72,13 @@ export default function NavBar() {
                 <Link to="/">Home</Link>
               </li>
               <li className="text-white hover:text-indigo-200">
-                <Link to="/blog">Blog</Link>
-              </li>
-              <li className="text-white hover:text-indigo-200">
-                <Link to="/about">About US</Link>
+                <Link to="/task">Task</Link>
               </li>
               <li className="text-white hover:text-indigo-200">
                 <Link to="/contact">Contact US</Link>
+              </li>
+              <li className="text-white hover:text-indigo-200">
+                <Link to="/about">About US</Link>
               </li>
             </ul>
             {user && user.uid ? (

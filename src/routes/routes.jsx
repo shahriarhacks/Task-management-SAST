@@ -4,6 +4,9 @@ import ErrorPage from "../pages/shared/er404";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Login/Register";
+import PrivateRoute from "../private/PrivateRoute";
+import Task from "../pages/Task/Task";
+import CreateTask from "../pages/Task/CreateTask";
 const routes = createBrowserRouter([
   {
     path: "/",
@@ -21,6 +24,22 @@ const routes = createBrowserRouter([
       {
         path: "/signup",
         element: <Register />,
+      },
+      {
+        path: "/task",
+        element: (
+          <PrivateRoute>
+            <Task />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/task/create",
+        element: (
+          <PrivateRoute>
+            <CreateTask />
+          </PrivateRoute>
+        ),
       },
     ],
   },
