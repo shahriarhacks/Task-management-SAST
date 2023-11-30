@@ -1,8 +1,10 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
+import useTitle from "../../hooks/useTitle";
 
 export default function NavBar() {
+  useTitle("Home");
   const [navbar, setNavbar] = useState(false);
 
   const { user, logout } = useContext(AuthContext);
@@ -21,7 +23,7 @@ export default function NavBar() {
         <div>
           <div className="flex items-center justify-between py-3 md:py-5 md:block">
             <Link to="/">
-              <h2 className="text-2xl font-bold text-white">LOGO</h2>
+              <h2 className="text-2xl font-bold text-white">TSM</h2>
             </Link>
             <div className="md:hidden">
               <button
@@ -74,12 +76,16 @@ export default function NavBar() {
               <li className="text-white hover:text-indigo-200">
                 <Link to="/task">Task</Link>
               </li>
-              <li className="text-white hover:text-indigo-200">
-                <Link to="/contact">Contact US</Link>
-              </li>
-              <li className="text-white hover:text-indigo-200">
-                <Link to="/about">About US</Link>
-              </li>
+              {user && user.uid && (
+                <>
+                  <li className="text-white hover:text-indigo-200">
+                    <Link to="/task/create">Create Task</Link>
+                  </li>
+                  <li className="text-white hover:text-indigo-200">
+                    <Link to="/task/complete">Complete Task</Link>
+                  </li>
+                </>
+              )}
             </ul>
             {user && user.uid ? (
               <>

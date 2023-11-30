@@ -1,17 +1,17 @@
 import { useQuery } from "react-query";
-import { TbTrashXFilled, TbEditCircle } from "react-icons/tb";
+import { FcApproval, FcEmptyTrash } from "react-icons/fc";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useTitle from "../../hooks/useTitle";
-import CreateTask from "./CreateTask";
 import { useContext } from "react";
 import { AuthContext } from "../../provider/AuthProvider";
+import CreateTask from "./CreateTask";
+import moment from "moment";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
 
-const Task = () => {
+const CompleteTask = () => {
   const axiosSecure = useAxiosSecure();
   const { user } = useContext(AuthContext);
-  useTitle("Task");
+  useTitle("Complete Task");
   const {
     data: tasks = [],
     refetch,
@@ -19,29 +19,11 @@ const Task = () => {
   } = useQuery({
     queryKey: ["task"],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/task?email=${user.email}`);
+      const res = await axiosSecure.get(`/task/complete?email=${user.email}`);
       refetch();
       return res.data;
     },
   });
-
-  const handleUpdate = async (data, id) => {
-    const updatedData = { ...data, status: true };
-    const { data: dbData } = await axiosSecure.patch(
-      `/task/${id}`,
-      updatedData
-    );
-    if (dbData.success) {
-      refetch();
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: dbData.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
-  };
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -87,9 +69,9 @@ const Task = () => {
             <div className="p-4">
               <div className="flex justify-around items-center">
                 <div>
-                  <button onClick={() => handleUpdate(task, task.id)}>
-                    <TbEditCircle size="2em" />
-                  </button>
+                  <div>
+                    <FcApproval size="2em" />
+                  </div>
                 </div>
                 <div>
                   <h4 className="text-xl text-center font-semibold text-blue-600">
@@ -98,20 +80,16 @@ const Task = () => {
                 </div>
                 <div>
                   <button onClick={() => handleDelete(task?.id)}>
-                    <TbTrashXFilled size="2em" />
+                    <FcEmptyTrash size="2em" />
                   </button>
                 </div>
               </div>
               <p className="mb-2 leading-normal text-center">
                 {task.description}
               </p>
-              <div className="flex justify-center items-center">
-                <Link
-                  to={`/task/update/${task.id}`}
-                  className="px-4 py-2 text-sm text-blue-100 bg-blue-500 rounded shadow"
-                >
-                  Edit
-                </Link>
+              <div className="flex justify-between items-center">
+                <div>Completed At :</div>
+                <div>{moment().format("llll")}</div>
               </div>
             </div>
           </div>
@@ -121,4 +99,4 @@ const Task = () => {
   }
 };
 
-export default Task;
+export default CompleteTask;
